@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>API Test</title>
+</head>
+<body>
+    <h1>API Test Page</h1>
+    <button onclick="testAPI()">Test API</button>
+    <button onclick="testUpload()">Test Upload</button>
+    <pre id="result"></pre>
+    <input type="file" id="fileInput" accept="image/*">
+    
+    <script>
+        async function testAPI() {
+            const result = document.getElementById('result');
+            try {
+                result.textContent = 'Testing API health...';
+                const response = await fetch('http://localhost:8000/health');
+                const data = await response.json();
+                result.textContent = JSON.stringify(data, null, 2);
+            } catch (err) {
+                result.textContent = 'Error: ' + err.message;
+            }
+        }
+        
+        async function testUpload() {
+            const fileInput = document.getElementById('fileInput');
+            const result = document.getElementById('result');
+            
+            if (!fileInput.files[0]) {
+                result.textContent = 'Please select a file first';
+                return;
+            }
+            
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+            
+            try {
+                result.textContent = 'Uploading...';
+                const response = await fetch('http://localhost:8000/audit/image', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                result.textContent = JSON.stringify(data, null, 2);
+            } catch (err) {
+                result.textContent = 'Error: ' + err.message;
+            }
+        }
+    </script>
+</body>
+</html>

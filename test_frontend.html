@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Frontend</title>
+    <script>
+        async function testAPI() {
+            console.log('Testing API...');
+            
+            try {
+                const response = await fetch('http://localhost:8000/audit/url', {
+                    method: 'POST',
+                    body: new URLSearchParams({ url: 'https://google.com' })
+                });
+                
+                const data = await response.json();
+                console.log('Success! Data received:', data);
+                document.getElementById('result').textContent = JSON.stringify(data, null, 2);
+            } catch(err) {
+                console.error('Error:', err);
+                document.getElementById('result').textContent = 'Error: ' + err.message;
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1>API Test</h1>
+    <button onclick="testAPI()">Test API</button>
+    <pre id="result"></pre>
+</body>
+</html>

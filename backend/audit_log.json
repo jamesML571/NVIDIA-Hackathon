@@ -1,0 +1,201 @@
+
+============================================================
+ANALYZING: https://google.com
+Images: {'total': 1, 'without_alt': 0}
+Forms: {'total': 1, 'inputs_without_labels': 3}
+Links: {'total': 17, 'without_text': 0}
+Has skip links: False
+Has semantic HTML: False
+Has viewport meta: False
+HTML lang: en
+
+FINAL SCORES for https://google.com:
+Overall Score: 70/100
+WCAG Compliance: 72
+Visual Clarity: 80
+Cognitive Load: 83.5
+Mobile Usability: 75
+Color Accessibility: 55
+Navigation Ease: 77
+Issues Found: 1 severe, 4 moderate, 1 casual
+============================================================
+
+{"timestamp": "2025-10-13T14:37:45.609100", "url": "google.com", "type": "url_audit", "analysis_time": 0.61, "overall_score": 70, "scores": {"wcag_compliance": 72, "visual_clarity": 80, "cognitive_load": 83.5, "mobile_usability": 75, "color_accessibility": 55, "navigation_ease": 77, "content_hierarchy": 79, "interactive_feedback": 80, "trust_signals": 90, "performance_perception": 90, "overall": 70}, "issues": {"severe": 1, "moderate": 4, "casual": 1}}
+
+============================================================
+ANALYZING: https://www.espn.com/
+Images: {'total': 97, 'without_alt': 90}
+Forms: {'total': 0, 'inputs_without_labels': 1}
+Links: {'total': 198, 'without_text': 11}
+Has skip links: False
+Has semantic HTML: True
+Has viewport meta: True
+HTML lang: en
+
+FINAL SCORES for https://www.espn.com/:
+Overall Score: 61/100
+WCAG Compliance: 56
+Visual Clarity: 80
+Cognitive Load: 83.5
+Mobile Usability: 90
+Color Accessibility: 55
+Navigation Ease: 67
+Issues Found: 2 severe, 4 moderate, 0 casual
+============================================================
+
+{"timestamp": "2025-10-13T14:38:22.194902", "url": "https://www.espn.com/", "type": "url_audit", "analysis_time": 0.42, "overall_score": 61, "scores": {"wcag_compliance": 56, "visual_clarity": 80, "cognitive_load": 83.5, "mobile_usability": 90, "color_accessibility": 55, "navigation_ease": 67, "content_hierarchy": 87, "interactive_feedback": 82, "trust_signals": 90, "performance_perception": 90, "overall": 61}, "issues": {"severe": 2, "moderate": 4, "casual": 0}}
+
+============================================================
+ANALYZING: https://santapod.co.uk/index.php
+Images: {'total': 67, 'without_alt': 5}
+Forms: {'total': 0, 'inputs_without_labels': 0}
+Links: {'total': 171, 'without_text': 74}
+Has skip links: False
+Has semantic HTML: True
+Has viewport meta: True
+HTML lang: en
+
+FINAL SCORES for https://santapod.co.uk/index.php:
+Overall Score: 82/100
+WCAG Compliance: 82
+Visual Clarity: 85
+Cognitive Load: 85
+Mobile Usability: 90
+Color Accessibility: 85
+Navigation Ease: 67
+Issues Found: 0 severe, 2 moderate, 1 casual
+============================================================
+
+{"timestamp": "2025-10-13T14:40:02.609753", "url": "https://santapod.co.uk/index.php", "type": "url_audit", "analysis_time": 1.27, "overall_score": 82, "scores": {"wcag_compliance": 82, "visual_clarity": 85, "cognitive_load": 85, "mobile_usability": 90, "color_accessibility": 85, "navigation_ease": 67, "content_hierarchy": 90, "interactive_feedback": 85, "trust_signals": 90, "performance_perception": 90, "overall": 82}, "issues": {"severe": 0, "moderate": 2, "casual": 1}}
+
+============================================================
+ANALYZING: https://www.cnbc.com/
+Images: {'total': 0, 'without_alt': 0}
+Forms: {'total': 0, 'inputs_without_labels': 0}
+Links: {'total': 0, 'without_text': 0}
+Has skip links: False
+Has semantic HTML: False
+Has viewport meta: False
+HTML lang: None
+
+FINAL SCORES for https://www.cnbc.com/:
+Overall Score: 75/100
+WCAG Compliance: 72
+Visual Clarity: 85
+Cognitive Load: 80
+Mobile Usability: 75
+Color Accessibility: 85
+Navigation Ease: 77
+Issues Found: 1 severe, 2 moderate, 1 casual
+============================================================
+
+{"timestamp": "2025-10-13T14:41:14.720326", "url": "https://www.cnbc.com/", "type": "url_audit", "analysis_time": 0.33, "overall_score": 75, "scores": {"wcag_compliance": 72, "visual_clarity": 85, "cognitive_load": 80, "mobile_usability": 75, "color_accessibility": 85, "navigation_ease": 77, "content_hierarchy": 82, "interactive_feedback": 85, "trust_signals": 90, "performance_perception": 90, "overall": 75}, "issues": {"severe": 1, "moderate": 2, "casual": 1}}
+
+============================================================
+ANALYZING: https://santapod.co.uk
+Images: {'total': 67, 'without_alt': 5}
+Forms: {'total': 0, 'inputs_without_labels': 0}
+Links: {'total': 171, 'without_text': 74}
+Has skip links: False
+Has semantic HTML: True
+Has viewport meta: True
+HTML lang: en
+
+FINAL SCORES for https://santapod.co.uk:
+Overall Score: 82/100
+WCAG Compliance: 82
+Visual Clarity: 85
+Cognitive Load: 85
+Mobile Usability: 90
+Color Accessibility: 85
+Navigation Ease: 67
+Issues Found: 0 severe, 2 moderate, 1 casual
+============================================================
+
+{"timestamp": "2025-10-13T14:42:00.624898", "url": "santapod.co.uk", "type": "url_audit", "analysis_time": 1.0, "overall_score": 82, "scores": {"wcag_compliance": 82, "visual_clarity": 85, "cognitive_load": 85, "mobile_usability": 90, "color_accessibility": 85, "navigation_ease": 67, "content_hierarchy": 90, "interactive_feedback": 85, "trust_signals": 90, "performance_perception": 90, "overall": 82}, "issues": {"severe": 0, "moderate": 2, "casual": 1}}
+
+============================================================
+ANALYZING: https://santapod.co.uk/index.php
+Images: {'total': 67, 'without_alt': 5}
+Forms: {'total': 0, 'inputs_without_labels': 0}
+Links: {'total': 171, 'without_text': 74}
+Has skip links: False
+Has semantic HTML: True
+Has viewport meta: True
+HTML lang: en
+
+FINAL SCORES for https://santapod.co.uk/index.php:
+Overall Score: 60/100
+WCAG Compliance: 64
+Visual Clarity: 70
+Cognitive Load: 70
+Mobile Usability: 75
+Color Accessibility: 70
+Navigation Ease: 43
+Issues Found: 0 severe, 2 moderate, 1 casual
+============================================================
+
+{"timestamp": "2025-10-13T14:50:52.171908", "url": "https://santapod.co.uk/index.php", "type": "url_audit", "analysis_time": 1.1, "overall_score": 60, "scores": {"wcag_compliance": 64, "visual_clarity": 70, "cognitive_load": 70, "mobile_usability": 75, "color_accessibility": 70, "navigation_ease": 43, "content_hierarchy": 70, "interactive_feedback": 70, "trust_signals": 75, "performance_perception": 75, "overall": 60}, "issues": {"severe": 0, "moderate": 2, "casual": 1}}
+
+============================================================
+ANALYZING: https://espn.com
+Images: {'total': 98, 'without_alt': 91}
+Forms: {'total': 0, 'inputs_without_labels': 1}
+Links: {'total': 198, 'without_text': 11}
+Has skip links: False
+Has semantic HTML: True
+Has viewport meta: True
+HTML lang: en
+
+FINAL SCORES for https://espn.com:
+Overall Score: 24/100
+WCAG Compliance: 38
+Visual Clarity: 65
+Cognitive Load: 68.5
+Mobile Usability: 75
+Color Accessibility: 40
+Navigation Ease: 43
+Issues Found: 2 severe, 4 moderate, 0 casual
+============================================================
+
+{"timestamp": "2025-10-13T14:51:00.816694", "url": "espn.com", "type": "url_audit", "analysis_time": 0.5, "overall_score": 24, "scores": {"wcag_compliance": 38, "visual_clarity": 65, "cognitive_load": 68.5, "mobile_usability": 75, "color_accessibility": 40, "navigation_ease": 43, "content_hierarchy": 67, "interactive_feedback": 67, "trust_signals": 75, "performance_perception": 75, "overall": 24}, "issues": {"severe": 2, "moderate": 4, "casual": 0}}
+
+    ============================================================
+    ADVANCED ANALYSIS: https://www.nvidia.com/en-us/
+    Category: general
+    Overall Score: 80/100
+    Severe Issues: 0
+    Analysis Time: 6.24s
+    ============================================================
+    
+{"timestamp": "2025-10-13T15:14:09.616149", "url": "https://www.nvidia.com/en-us/", "type": "advanced_audit", "success": true, "overall_score": 80, "site_category": "General Website", "analysis_time": 6.24, "issues": {"severe": 0, "moderate": 1, "casual": 0}}
+
+    ============================================================
+    ADVANCED ANALYSIS: https://santapod.co.uk/index.php
+    Category: general
+    Overall Score: 69/100
+    Severe Issues: 1
+    Analysis Time: 7.18s
+    ============================================================
+    
+{"timestamp": "2025-10-13T15:14:34.451443", "url": "https://santapod.co.uk/index.php", "type": "advanced_audit", "success": true, "overall_score": 69, "site_category": "General Website", "analysis_time": 7.18, "issues": {"severe": 1, "moderate": 2, "casual": 0}}
+
+    ============================================================
+    ADVANCED ANALYSIS: google.com
+    Category: general
+    Overall Score: 55/100
+    Severe Issues: 2
+    Analysis Time: 6.28s
+    ============================================================
+    
+{"timestamp": "2025-10-13T15:24:34.134151", "url": "google.com", "type": "advanced_audit", "success": true, "overall_score": 55, "site_category": "General Website", "analysis_time": 6.28, "issues": {"severe": 2, "moderate": 2, "casual": 0}}
+
+    ============================================================
+    ADVANCED ANALYSIS: cnbc.com
+    Category: general
+    Overall Score: 61/100
+    Severe Issues: 0
+    Analysis Time: 7.24s
+    ============================================================
+    
+{"timestamp": "2025-10-13T15:25:45.364094", "url": "cnbc.com", "type": "advanced_audit", "success": true, "overall_score": 61, "site_category": "General Website", "analysis_time": 7.24, "issues": {"severe": 0, "moderate": 2, "casual": 0}}

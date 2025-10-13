@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accessibility Auditor - Interactive Edition</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .score-gradient-excellent {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+        .score-gradient-good {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        }
+        .score-gradient-moderate {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        }
+        .score-gradient-poor {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        }
+        .severity-severe { 
+            border-left: 4px solid #dc2626; 
+            background: #fef2f2;
+        }
+        .severity-moderate { 
+            border-left: 4px solid #f59e0b; 
+            background: #fffbeb;
+        }
+        .severity-casual { 
+            border-left: 4px solid #3b82f6; 
+            background: #eff6ff;
+        }
+        .loading-spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .score-ring {
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+        .score-fill {
+            transition: stroke-dashoffset 1s ease-in-out;
+        }
+        .issue-number {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+        .chat-message {
+            animation: slideIn 0.3s ease-out;
+        }
+        @keyframes slideIn {
+            from {
+                transform: translateY(10px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+        const API_BASE_URL = 'http://localhost:8000';
+
+        // Score gauge component
+        function ScoreGauge({ score, label, size = "small" }) {
+            const radius = size === "large" ? 60 : 40;
+            const strokeWidth = size === "large" ? 8 : 6;
+            const circumference = 2 * Math.PI * radius;
+            const strokeDashoffset = circumference - (score / 100) * circumference;
+            
+            let colorClass = '';
+            if (score >= 80) colorClass = 'text-green-500';
+            else if (score >= 60) colorClass = 'text-blue-500';
+            else if (score >= 40) colorClass = 'text-amber-500';
+            else colorClass = 'text-red-500';
+            
+            return (
+                <div className="flex flex-col items-center">
+                    <div className="relative">
+                        <svg width={radius * 2 + 20} height={radius * 2 + 20}>
+                            <circle
+                                className="score-ring"
+                                cx={radius + 10}
+                                cy={radius + 10}
+                                r={radius}
+                                fill="none"
+                                stroke="#e5e7eb"
+                                strokeWidth={strokeWidth}
+                            />
+                            <circle
+                                className={`score-ring score-fill ${colorClass}`}
+                                cx={radius + 10}
+                                cy={radius + 10}
+                                r={radius}
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth={strokeWidth}
+                                strokeDasharray={circumference}
+                                strokeDashoffset={strokeDashoffset}
+                                strokeLinecap="round"
+                            />
+                        </svg>
+                        <div className="absolute inset-0 flex items-center justify-center">
+                            <span className={`${size === 'large' ? 'text-3xl' : 'text-xl'} font-bold`}>
+                                {score}
+                            </span>
+                        </div>
+                    </div>
+                    <p className={`mt-2 ${size === 'large' ? 'text-base font-semibold' : 'text-sm'} text-gray-600 text-center`}>
+                        {label}
+                    </p>
+                </div>
+            );
+        }
+
+        // Interactive Chat Component
+        function InteractiveChat({ issues, onAskQuestion }) {
+            const [chatInput, setChatInput] = useState('');
+            const [chatHistory, setChatHistory] = useState([]);
+            const [isTyping, setIsTyping] = useState(false);
+            const chatEndRef = useRef(null);
+
+            const scrollToBottom = () => {
+                chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+            };
+
+            useEffect(() => {
+                scrollToBottom();
+            }, [chatHistory]);
+
+            const handleSubmit = async (e) => {
+                e.preventDefault();
+                if (!chatInput.trim()) return;
+
+                const userMessage = chatInput;
+                setChatInput('');
+                
+                // Add user message
+                setChatHistory(prev => [...prev, { type: 'user', message: userMessage }]);
+                setIsTyping(true);
+
+                // Simulate AI response (in real implementation, this would call the backend)
+                setTimeout(() => {
+                    let response = '';
+                    
+                    // Parse for issue references
+                    const issueMatch = userMessage.match(/#(\d+)|issue (\d+)|problem (\d+)/i);
+                    if (issueMatch) {
+                        const issueNum = parseInt(issueMatch[1] || issueMatch[2] || issueMatch[3]);
+                        const issue = issues[issueNum - 1];
+                        
+                        if (issue) {
+                            response = `For Issue #${issueNum} "${issue.title}":\n\n`;
+                            response += `**Step-by-step fix:**\n`;
+                            response += `1. ${issue.recommendation}\n\n`;
+                            response += `**Code example:**\n`;
+                            
+                            if (issue.title.includes('Alternative Text')) {
+                                response += '```html\n<img src="logo.png" alt="Company logo - Home">\n```\n\n';
+                                response += 'For decorative images:\n```html\n<img src="decoration.png" alt="" role="presentation">\n```';
+                            } else if (issue.title.includes('Form')) {
+                                response += '```html\n<label for="email">Email Address</label>\n<input type="email" id="email" name="email" required>\n```';
+                            } else if (issue.title.includes('Skip')) {
+                                response += '```html\n<a href="#main-content" class="skip-link">Skip to main content</a>\n```\n\n';
+                                response += 'CSS:\n```css\n.skip-link {\n  position: absolute;\n  left: -10000px;\n}\n.skip-link:focus {\n  left: 0;\n}\n```';
+                            } else {
+                                response += `Follow the recommendation: ${issue.recommendation}`;
+                            }
+                            
+                            response += `\n\n**Why it matters:** ${issue.why_this_matters}`;
+                            response += `\n\n**Expected impact:** ${issue.impact_metric}`;
+                        } else {
+                            response = `I couldn't find issue #${issueNum}. Please check the issue number and try again.`;
+                        }
+                    } else if (userMessage.toLowerCase().includes('how') || userMessage.toLowerCase().includes('fix')) {
+                        response = 'To get specific help, reference an issue number like "How do I fix issue #1?" or "Help with #3".\n\nYou can also ask:\n- "Show me code for issue #2"\n- "Explain #4 in detail"\n- "What\'s the priority order?"';
+                    } else if (userMessage.toLowerCase().includes('priority') || userMessage.toLowerCase().includes('order')) {
+                        const severeIssues = issues.filter((i, idx) => {
+                            i.index = idx + 1;
+                            return i.severity === 'severe';
+                        });
+                        const moderateIssues = issues.filter((i, idx) => {
+                            i.index = idx + 1;
+                            return i.severity === 'moderate';
+                        });
+                        
+                        response = '**Recommended fix order:**\n\n';
+                        response += '🔴 **Critical (Fix First):**\n';
+                        severeIssues.forEach(i => {
+                            response += `  #${i.index} - ${i.title}\n`;
+                        });
+                        response += '\n🟡 **Important (Fix Next):**\n';
+                        moderateIssues.forEach(i => {
+                            response += `  #${i.index} - ${i.title}\n`;
+                        });
+                        response += '\n\nStart with critical issues as they block users with disabilities.';
+                    } else {
+                        response = `I can help you fix specific accessibility issues! Try asking:\n\n`;
+                        response += `• "How do I fix issue #1?"\n`;
+                        response += `• "Show me code for #2"\n`;
+                        response += `• "What's the priority order?"\n`;
+                        response += `• "Explain issue #3 in detail"\n\n`;
+                        response += `Which issue would you like help with?`;
+                    }
+                    
+                    setChatHistory(prev => [...prev, { type: 'assistant', message: response }]);
+                    setIsTyping(false);
+                }, 1000);
+            };
+
+            const suggestedQuestions = [
+                "How do I fix issue #1?",
+                "What's the priority order?",
+                "Show me code examples",
+                "Which issue is most critical?"
+            ];
+
+            return (
+                <div className="bg-white rounded-lg shadow-lg p-6 mt-6">
+                    <h2 className="text-2xl font-bold mb-4">💬 Interactive Help Assistant</h2>
+                    <p className="text-gray-600 mb-4">
+                        Ask me about specific issues by referencing their numbers (e.g., "How do I fix issue #1?")
+                    </p>
+                    
+                    {/* Suggested questions */}
+                    <div className="flex flex-wrap gap-2 mb-4">
+                        {suggestedQuestions.map((q, idx) => (
+                            <button
+                                key={idx}
+                                onClick={() => setChatInput(q)}
+                                className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm hover:bg-purple-200 transition-colors"
+                            >
+                                {q}
+                            </button>
+                        ))}
+                    </div>
+
+                    {/* Chat history */}
+                    <div className="bg-gray-50 rounded-lg p-4 h-96 overflow-y-auto mb-4">
+                        {chatHistory.length === 0 ? (
+                            <div className="text-center text-gray-400 mt-8">
+                                <p className="text-lg mb-2">No messages yet</p>
+                                <p className="text-sm">Ask about any numbered issue to get detailed help!</p>
+                            </div>
+                        ) : (
+                            chatHistory.map((msg, idx) => (
+                                <div key={idx} className={`chat-message mb-4 ${msg.type === 'user' ? 'text-right' : 'text-left'}`}>
+                                    <div className={`inline-block max-w-3/4 p-3 rounded-lg ${
+                                        msg.type === 'user' 
+                                            ? 'bg-purple-600 text-white' 
+                                            : 'bg-white border border-gray-200'
+                                    }`}>
+                                        <pre className="whitespace-pre-wrap font-sans text-sm">
+                                            {msg.message}
+                                        </pre>
+                                    </div>
+                                </div>
+                            ))
+                        )}
+                        {isTyping && (
+                            <div className="chat-message text-left">
+                                <div className="inline-block bg-white border border-gray-200 p-3 rounded-lg">
+                                    <div className="flex space-x-2">
+                                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                        <div ref={chatEndRef} />
+                    </div>
+
+                    {/* Input form */}
+                    <form onSubmit={handleSubmit} className="flex gap-2">
+                        <input
+                            type="text"
+                            value={chatInput}
+                            onChange={(e) => setChatInput(e.target.value)}
+                            placeholder="Ask about issue #1, #2, etc. (e.g., 'How do I fix issue #3?')"
+                            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"
+                        />
+                        <button
+                            type="submit"
+                            disabled={!chatInput.trim() || isTyping}
+                            className="px-6 py-2 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700 disabled:bg-gray-400 transition-all"
+                        >
+                            {isTyping ? 'Thinking...' : 'Ask'}
+                        </button>
+                    </form>
+                </div>
+            );
+        }
+
+        function App() {
+            const [url, setUrl] = useState('');
+            const [loading, setLoading] = useState(false);
+            const [results, setResults] = useState(null);
+            const [error, setError] = useState('');
+            const [selectedImage, setSelectedImage] = useState(null);
+            const [inputType, setInputType] = useState('url'); // 'url' or 'image'
+
+            const handleUrlSubmit = async () => {
+                if (!url && inputType === 'url') {
+                    setError('Please enter a URL');
+                    return;
+                }
+                if (!selectedImage && inputType === 'image') {
+                    setError('Please select an image');
+                    return;
+                }
+
+                setLoading(true);
+                setError('');
+                setResults(null);
+
+                try {
+                    const formData = new FormData();
+                    
+                    if (inputType === 'url') {
+                        formData.append('url', url);
+                        const response = await fetch(`${API_BASE_URL}/audit/url`, {
+                            method: 'POST',
+                            body: formData
+                        });
+                        
+                        if (!response.ok) {
+                            throw new Error(`Server error: ${response.status}`);
+                        }
+                        
+                        const data = await response.json();
+                        console.log('Received data:', data);
+                        setResults(data);
+                    } else {
+                        // Image upload
+                        formData.append('file', selectedImage);
+                        const response = await fetch(`${API_BASE_URL}/audit/image`, {
+                            method: 'POST',
+                            body: formData
+                        });
+                        
+                        if (!response.ok) {
+                            throw new Error(`Server error: ${response.status}`);
+                        }
+                        
+                        const data = await response.json();
+                        setResults(data);
+                    }
+                } catch (err) {
+                    console.error('Error:', err);
+                    setError(err.message || 'An error occurred');
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            const handleImageSelect = (e) => {
+                const file = e.target.files[0];
+                if (file && file.type.startsWith('image/')) {
+                    setSelectedImage(file);
+                    setError('');
+                } else {
+                    setError('Please select a valid image file');
+                }
+            };
+
+            const getOverallScoreClass = (score) => {
+                if (score >= 80) return 'score-gradient-excellent';
+                if (score >= 60) return 'score-gradient-good';
+                if (score >= 40) return 'score-gradient-moderate';
+                return 'score-gradient-poor';
+            };
+
+            const getScoreLabel = (score) => {
+                if (score >= 80) return 'Excellent';
+                if (score >= 60) return 'Good';
+                if (score >= 40) return 'Needs Work';
+                return 'Critical';
+            };
+
+            return (
+                <div className="min-h-screen bg-gray-50">
+                    {/* Header */}
+                    <header className="gradient-bg text-white py-8 px-6">
+                        <div className="max-w-7xl mx-auto">
+                            <h1 className="text-4xl font-bold mb-2">🚀 Accessibility Auditor Interactive</h1>
+                            <p className="text-xl opacity-90">Analyze websites & images with numbered issues and interactive help</p>
+                            <p className="text-sm mt-2 opacity-75">Ask specific questions about each issue • Get code examples • Priority guidance</p>
+                        </div>
+                    </header>
+
+                    <div className="max-w-7xl mx-auto p-6">
+                        {/* Input Section */}
+                        <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
+                            {/* Input Type Selector */}
+                            <div className="flex gap-4 mb-4">
+                                <button
+                                    onClick={() => setInputType('url')}
+                                    className={`px-4 py-2 rounded-lg font-medium transition-all ${
+                                        inputType === 'url' 
+                                            ? 'bg-purple-600 text-white' 
+                                            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                                    }`}
+                                >
+                                    🌐 Analyze URL
+                                </button>
+                                <button
+                                    onClick={() => setInputType('image')}
+                                    className={`px-4 py-2 rounded-lg font-medium transition-all ${
+                                        inputType === 'image' 
+                                            ? 'bg-purple-600 text-white' 
+                                            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                                    }`}
+                                >
+                                    🖼️ Upload Screenshot
+                                </button>
+                            </div>
+
+                            {inputType === 'url' ? (
+                                <div className="mb-4">
+                                    <label className="block text-gray-700 font-medium mb-2">
+                                        Enter Website URL
+                                    </label>
+                                    <div className="flex gap-3">
+                                        <input
+                                            type="url"
+                                            value={url}
+                                            onChange={(e) => setUrl(e.target.value)}
+                                            onKeyPress={(e) => e.key === 'Enter' && handleUrlSubmit()}
+                                            placeholder="https://example.com"
+                                            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"
+                                        />
+                                        <button
+                                            onClick={handleUrlSubmit}
+                                            disabled={loading}
+                                            className="px-8 py-2 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700 disabled:bg-gray-400 transition-all"
+                                        >
+                                            {loading ? 'Analyzing...' : 'Analyze'}
+                                        </button>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="mb-4">
+                                    <label className="block text-gray-700 font-medium mb-2">
+                                        Upload Screenshot
+                                    </label>
+                                    <div className="flex gap-3 items-center">
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={handleImageSelect}
+                                            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg"
+                                        />
+                                        <button
+                                            onClick={handleUrlSubmit}
+                                            disabled={loading || !selectedImage}
+                                            className="px-8 py-2 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700 disabled:bg-gray-400 transition-all"
+                                        >
+                                            {loading ? 'Analyzing...' : 'Analyze'}
+                                        </button>
+                                    </div>
+                                    {selectedImage && (
+                                        <p className="mt-2 text-sm text-gray-600">
+                                            Selected: {selectedImage.name}
+                                        </p>
+                                    )}
+                                </div>
+                            )}
+
+                            {error && (
+                                <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
+                                    ⚠️ {error}
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Loading State */}
+                        {loading && (
+                            <div className="flex flex-col items-center justify-center py-12">
+                                <div className="loading-spinner mb-4"></div>
+                                <p className="text-gray-600">Performing comprehensive analysis...</p>
+                            </div>
+                        )}
+
+                        {/* Results */}
+                        {results && !loading && (
+                            <div className="space-y-6">
+                                {/* Overall Score Card */}
+                                {results.overall_score !== undefined && (
+                                    <div className={`${getOverallScoreClass(results.overall_score)} rounded-xl shadow-xl p-8 text-white`}>
+                                        <div className="flex items-center justify-between">
+                                            <div>
+                                                <h2 className="text-3xl font-bold mb-2">Overall Accessibility Score</h2>
+                                                <p className="text-lg opacity-90">
+                                                    {results.site_profile && `${results.site_profile} • `}
+                                                    {getScoreLabel(results.overall_score)} Performance
+                                                </p>
+                                            </div>
+                                            <div className="text-7xl font-bold">
+                                                {results.overall_score}
+                                                <span className="text-2xl">/100</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Comprehensive Scores Section */}
+                                {results.scores && (
+                                    <div className="bg-white rounded-lg shadow-lg p-6">
+                                        <h2 className="text-2xl font-bold mb-6">📊 Detailed Score Breakdown</h2>
+                                        
+                                        {/* Primary Scores */}
+                                        <div className="grid grid-cols-2 md:grid-cols-5 gap-6 mb-8">
+                                            <ScoreGauge 
+                                                score={Math.round(results.scores.wcag_compliance || 0)} 
+                                                label="WCAG Compliance" 
+                                            />
+                                            <ScoreGauge 
+                                                score={Math.round(results.scores.visual_clarity || 0)} 
+                                                label="Visual Clarity" 
+                                            />
+                                            <ScoreGauge 
+                                                score={Math.round(results.scores.cognitive_load || 0)} 
+                                                label="Cognitive Load" 
+                                            />
+                                            <ScoreGauge 
+                                                score={Math.round(results.scores.mobile_usability || 0)} 
+                                                label="Mobile Usability" 
+                                            />
+                                            <ScoreGauge 
+                                                score={Math.round(results.scores.color_accessibility || 0)} 
+                                                label="Color Access" 
+                                            />
+                                        </div>
+                                        
+                                        {/* Secondary Scores */}
+                                        <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
+                                            <ScoreGauge 
+                                                score={Math.round(results.scores.navigation_ease || 0)} 
+                                                label="Navigation" 
+                                            />
+                                            <ScoreGauge 
+                                                score={Math.round(results.scores.content_hierarchy || 0)} 
+                                                label="Hierarchy" 
+                                            />
+                                            <ScoreGauge 
+                                                score={Math.round(results.scores.interactive_feedback || 0)} 
+                                                label="Feedback" 
+                                            />
+                                            <ScoreGauge 
+                                                score={Math.round(results.scores.trust_signals || 0)} 
+                                                label="Trust Signals" 
+                                            />
+                                            <ScoreGauge 
+                                                score={Math.round(results.scores.performance_perception || 0)} 
+                                                label="Speed Feel" 
+                                            />
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Summary */}
+                                <div className="bg-white rounded-lg shadow-lg p-6">
+                                    <h2 className="text-2xl font-bold mb-4">📋 Analysis Summary</h2>
+                                    <p className="text-gray-700 mb-4 text-lg leading-relaxed">{results.summary}</p>
+                                    <div className="grid grid-cols-3 gap-4">
+                                        <div className="text-center p-4 bg-red-50 rounded-lg">
+                                            <div className="text-3xl font-bold text-red-600">
+                                                {results.severe_count || 0}
+                                            </div>
+                                            <div className="text-sm text-gray-600">Severe Issues</div>
+                                        </div>
+                                        <div className="text-center p-4 bg-amber-50 rounded-lg">
+                                            <div className="text-3xl font-bold text-amber-600">
+                                                {results.moderate_count || 0}
+                                            </div>
+                                            <div className="text-sm text-gray-600">Moderate</div>
+                                        </div>
+                                        <div className="text-center p-4 bg-blue-50 rounded-lg">
+                                            <div className="text-3xl font-bold text-blue-600">
+                                                {results.casual_count || 0}
+                                            </div>
+                                            <div className="text-sm text-gray-600">Casual</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Numbered Issues */}
+                                {results.issues && results.issues.length > 0 && (
+                                    <div className="bg-white rounded-lg shadow-lg p-6">
+                                        <h2 className="text-2xl font-bold mb-4">🎯 Issues Found (Reference by Number)</h2>
+                                        <div className="space-y-4">
+                                            {results.issues.map((issue, index) => (
+                                                <div key={index} className={`p-5 rounded-lg severity-${issue.severity} flex gap-4`}>
+                                                    <div className="issue-number">
+                                                        {index + 1}
+                                                    </div>
+                                                    <div className="flex-1">
+                                                        <div className="flex justify-between items-start mb-3">
+                                                            <h3 className="font-bold text-lg text-gray-900">
+                                                                Issue #{index + 1}: {issue.title}
+                                                            </h3>
+                                                            <span className={`px-3 py-1 rounded-full text-xs font-semibold
+                                                                ${issue.severity === 'severe' ? 'bg-red-100 text-red-700' :
+                                                                  issue.severity === 'moderate' ? 'bg-amber-100 text-amber-700' :
+                                                                  'bg-blue-100 text-blue-700'}`}>
+                                                                {issue.severity ? issue.severity.toUpperCase() : 'INFO'}
+                                                            </span>
+                                                        </div>
+                                                        
+                                                        {/* Specific Problem Description */}
+                                                        <div className="mb-4">
+                                                            <p className="text-gray-700 leading-relaxed">{issue.description}</p>
+                                                        </div>
+                                                        
+                                                        {/* The Fix */}
+                                                        <div className="bg-green-50 rounded-lg p-4 mb-4">
+                                                            <p className="font-semibold text-green-800 mb-2">✅ How to Fix:</p>
+                                                            <p className="text-gray-700">{issue.recommendation}</p>
+                                                        </div>
+                                                        
+                                                        {/* Impact Metrics */}
+                                                        {issue.impact_metric && (
+                                                            <div className="bg-purple-50 rounded-lg p-4 mb-4">
+                                                                <p className="font-semibold text-purple-800 mb-1">📈 Expected Impact:</p>
+                                                                <p className="text-gray-700">{issue.impact_metric}</p>
+                                                            </div>
+                                                        )}
+                                                        
+                                                        {/* Why This Matters - at the bottom of each */}
+                                                        {issue.why_this_matters && (
+                                                            <div className="bg-blue-50 rounded-lg p-4">
+                                                                <p className="font-semibold text-blue-800 mb-1">💡 Why This Matters:</p>
+                                                                <p className="text-gray-700 text-sm">{issue.why_this_matters}</p>
+                                                            </div>
+                                                        )}
+                                                        
+                                                        {/* Quick reference */}
+                                                        <div className="mt-3 text-xs text-gray-500">
+                                                            💬 Ask about this issue: "How do I fix issue #{index + 1}?"
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Interactive Chat */}
+                                {results.issues && results.issues.length > 0 && (
+                                    <InteractiveChat 
+                                        issues={results.issues} 
+                                        onAskQuestion={(question) => console.log('Question:', question)}
+                                    />
+                                )}
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Footer */}
+                    <footer className="mt-12 py-6 text-center text-gray-500 text-sm">
+                        Interactive Edition • Numbered Issues • Ask Specific Questions • Built for NVIDIA Hackathon 2025
+                    </footer>
+                </div>
+            );
+        }
+
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+</html>
