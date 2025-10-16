@@ -58,6 +58,16 @@ User drops image                      AI analyzes & returns fixes
 
 Simple as that. Frontend sends image/URL, backend processes it, Nemotron does the thinking.
 
+Tech Stack
+---------
+
+**Frontend**: React + TypeScript (because vanilla JS is chaos)  
+**Backend**: FastAPI + Python (async all the things)  
+**AI Model**: NVIDIA Nemotron-4-340B (via NIM API)  
+**Image Processing**: Pillow (for screenshot handling)  
+**HTTP Client**: httpx (better than requests for async)  
+**Deployment**: Just Python, no Docker needed for hackathon
+
 API Endpoints
 ------------
 
