@@ -2,7 +2,7 @@
 
 **Agents for Impact** - Building AI agents that make the web accessible to everyone
 
-## 🏆 Hackathon Focus
+##  Hackathon Focus
 - **Event**: NVIDIA & Vercel "Agents for Impact" Hackathon
 - **Date**: October 13, 2025
 - **Time Limit**: 2 hours
@@ -155,11 +155,3 @@ MIT License - Use freely for accessibility improvements!
 
 ---
 
-**Remember**: You have 2 hours! Focus on:
-1. Get the API key
-2. Start the backend
-3. Open the frontend
-4. Demo with screenshots
-5. Show Nemotron's intelligence in recommendations
-
-Good luck! 🚀
