@@ -90,14 +90,6 @@ Troubleshooting
 **"Module not found"** - Run the pip install command again  
 **"Port in use"** - Kill whatever's on 8000 or change the port  
 
-Future Ideas (If We Had More Than 2 Hours)
-------------------------------------------
-
-- Auto-screenshot websites with Playwright
-- Export reports as PDF
-- Browser extension
-- Batch analyze multiple pages
-- Real-time monitoring
 
 Built For
 --------
